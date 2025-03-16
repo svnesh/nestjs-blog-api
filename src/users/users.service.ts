@@ -23,13 +23,12 @@ export class UsersService {
     return user;
   }
 
-  async create(createUserDto: CreateUserDto): Promise<Partial<User>> {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     const {password, ...others} = createUserDto;
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = { password: hashedPassword, ...others};
     const user = await this.usersRepository.save(newUser);
-    const {name, id} = user
-    return {name, id};
+    return user;
   }
 
   async update(id: number, updateUserDto: Partial<CreateUserDto>) {
