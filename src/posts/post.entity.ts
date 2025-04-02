@@ -14,8 +14,8 @@ export class Post{
   imageURL: string;
 
   @ManyToOne(() => User, (user: User) => user.id)
-  @JoinColumn()
-  user: User | number;
+  @JoinColumn({name: 'userID'})
+  userID: User | number;
 
   @CreateDateColumn()
   createdAt: Date;

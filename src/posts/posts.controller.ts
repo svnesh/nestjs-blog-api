@@ -2,6 +2,8 @@ import { Body, Controller, Delete, Get, Logger, Param, Post, Request, UploadedFi
 import { PostsService } from './posts.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreatePostDto } from './dto/create.post.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { GetUser } from 'src/common/get-user.decorator';
 
 @Controller('posts')
 export class PostsController {
@@ -11,15 +13,15 @@ export class PostsController {
     private postService: PostsService,
   ){}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   async createPost (
     @UploadedFile() file: Express.Multer.File,
     @Body() createPostDto: CreatePostDto,
-    @Request() req,
+    @GetUser() reqUser
   ){
-    this.logger.log(req);
-    return this.postService.createPost(createPostDto, req.user, file);
+    return this.postService.createPost(createPostDto, reqUser, file);
   }
 
   @Get()

@@ -16,13 +16,17 @@ export class PostsService {
     private readonly cloudinaryService: CloudinaryService, 
   ) {}
 
-  async createPost(createPostDto: CreatePostDto, user: User, file: Express.Multer.File): Promise<Post> {
+  async createPost(createPostDto: CreatePostDto, reqUser, file: Express.Multer.File): Promise<Post> {
     try{
       let imgUrl = null;
       if (file){
         imgUrl = await this.cloudinaryService.uploadImage(file);
       }
-      const newPost = await this.postRepository.create({...createPostDto, imageURL: imgUrl, user});
+      const newPost = await this.postRepository.create({
+        ...createPostDto, 
+        imageURL: imgUrl, 
+        userID: reqUser.userId
+      });
       return this.postRepository.save(newPost);
     } catch(error) {
       this.logger.error(error)
@@ -39,7 +43,7 @@ export class PostsService {
 
   async deletePost(id: number, userId: number): Promise<void> {
     const post = await this.getPostById(id);
-    if ((post.user as User).id !== userId){ throw new Error('Not a valid action.') }
+    if ((post.userID as User).id !== userId){ throw new Error('Not a valid action.') }
     await this.postRepository.delete(id);
   }
 
