@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Logger, Param, Post, Request, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Param, Post, Request, UploadedFile, UseGuards, UseInterceptors, UsePipes } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreatePostDto } from './dto/create.post.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { GetUser } from 'src/common/get-user.decorator';
+import { CaptionValidationPipe } from './caption-validation.pipe';
 
 @Controller('posts')
 export class PostsController {
@@ -18,7 +19,7 @@ export class PostsController {
   @UseInterceptors(FileInterceptor('file'))
   async createPost (
     @UploadedFile() file: Express.Multer.File,
-    @Body() createPostDto: CreatePostDto,
+    @Body(new CaptionValidationPipe()) createPostDto: CreatePostDto,
     @GetUser() reqUser
   ){
     return this.postService.createPost(createPostDto, reqUser, file);
