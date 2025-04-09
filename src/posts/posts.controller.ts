@@ -4,7 +4,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CreatePostDto } from './dto/create.post.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { GetUser } from 'src/common/get-user.decorator';
-import { CaptionValidationPipe } from './caption-validation.pipe';
+import { CaptionValidationPipe } from './validation-pipe/caption-validation.pipe';
+import { ImageValidationPipe } from './validation-pipe/image-validation.pipe';
 
 @Controller('posts')
 export class PostsController {
@@ -18,8 +19,8 @@ export class PostsController {
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   async createPost (
-    @UploadedFile() file: Express.Multer.File,
-    @Body(new CaptionValidationPipe()) createPostDto: CreatePostDto,
+    @UploadedFile(ImageValidationPipe) file: Express.Multer.File,
+    @Body(CaptionValidationPipe) createPostDto: CreatePostDto,
     @GetUser() reqUser
   ){
     return this.postService.createPost(createPostDto, reqUser, file);
