@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,6 +8,7 @@ import { CloudinaryService } from './cloudinary/cloudinary.service';
 import { ConfigModule } from '@nestjs/config';
 import { PostsModule } from './posts/posts.module';
 import { JwtService } from '@nestjs/jwt';
+import { LoggerMiddleware } from './common/logger/logger.middleware';
 
 @Module({
   imports: [
@@ -31,4 +32,10 @@ import { JwtService } from '@nestjs/jwt';
   controllers: [AppController],
   providers: [AppService, CloudinaryService, JwtService],
 })
-export class AppModule { }
+export class AppModule {
+  configure(consumer: MiddlewareConsumer){
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
+  }
+ }
